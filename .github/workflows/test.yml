@@ -16,7 +16,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: |
-            ${{ secrets.DOCKERHUB_NAMESPACE }}/yet-another-pihole-dot-doh
+            chasecares/yet-another-pihole-dot-doh
             ghcr.io/${{ github.repository_owner }}/yet-another-pihole-dot-doh
           flavor: |
             latest=true
