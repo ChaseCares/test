@@ -19,16 +19,16 @@ jobs:
             pihole/pihole
             ghcr.io/pi-hole/pihole
           flavor: |
-            latest=${{ startsWith(github.ref, 'refs/tags/') }}
+            latest=true
           tags: |
-            type=ref,event=branch
-            type=ref,event=tag
+            type=ref,value=latest
+            type=ref,event=tag,enable=${{ github.event_name != 'workflow_dispatch' }}
       -
         name: Docker meta
         run:
-          echo "............."
-          ${{ steps.meta.outputs.tags }}
-          ${{ steps.meta.outputs.labels }}
+          echo "......$github.event_name......."
+          echo ${{ steps.meta.outputs.tags }}
+          echo ${{ steps.meta.outputs.labels }}
           echo "............."
         
         
