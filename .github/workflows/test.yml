@@ -35,5 +35,7 @@ jobs:
             type=schedule
             type=ref,event=branch,enable=${{ github.event_name != 'schedule' }}
             type=ref,event=tag
-          run: |
-            echo "$github.event_name"
+      -
+        name: "Echo"
+        run: |
+          echo "$github.event_name"
