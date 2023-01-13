@@ -16,13 +16,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: |
-            pihole/pihole
-            ghcr.io/pi-hole/pihole
+            ${{ secrets.DOCKERHUB_NAMESPACE }}/yet-another-pihole-dot-doh
+            ghcr.io/${{ github.repository_owner }}/yet-another-pihole-dot-doh
           flavor: |
             latest=true
           tags: |
-            type=ref,value=latest
-            type=ref,event=tag,enable=${{ github.event_name != 'workflow_dispatch' }}
+            type=ref,event=tag
       -
         name: Docker meta
         run:
