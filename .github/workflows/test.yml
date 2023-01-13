@@ -27,7 +27,7 @@ jobs:
       -
         name: Docker meta
         run:
-          ${{ steps.meta.outputs.tags }}
-          ${{ steps.meta.outputs.labels }}
+          echo "$steps.meta.outputs.tags"
+
         
         
