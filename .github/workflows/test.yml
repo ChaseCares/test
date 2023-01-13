@@ -22,6 +22,7 @@ jobs:
             latest=auto
           tags: |
             type=ref,event=tag
+            type=ref,event=branch
       -
         name: Docker meta
         run:
