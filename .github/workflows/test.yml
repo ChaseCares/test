@@ -27,8 +27,7 @@ jobs:
         name: Docker meta
         run:
           echo "......$github.event_name......."
-          echo ${{ steps.meta.outputs.tags }}
-          echo ${{ steps.meta.outputs.labels }}
+          echo ${{ github.ref }}
           echo "............."
         
         
