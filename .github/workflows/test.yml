@@ -10,24 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-        name: Docker meta
-        id: pihole_meta
-        uses: docker/metadata-action@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          images: |
-            chasecares/yet-another-pihole-dot-doh
-            ghcr.io/${{ github.repository_owner }}/yet-another-pihole-dot-doh
-          flavor: |
-            latest=auto
-          tags: |
-            type=ref,event=tag
-            type=raw,value=latest,enable={{is_default_branch}}
-      -
-        name: Docker meta
+        name: echo
         run:
           echo "......$github.event_name......."
-          echo ${{ github.ref }}
+          echo "${{ github.event_name }}"
+          echo "${{ github.ref }}"
+          docker -v
           echo "............."
         
         
