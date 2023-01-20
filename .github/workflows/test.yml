@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: echo
-      - run: echo "......$github.event_name......."
-      - run: echo "${{ github.event_name }}"
-      - run: echo "${{ github.ref }}"
-      - run: docker -v
-      - run: echo "............."
+      - run: echo "......$github.event_name......." && \
+             echo "${{ github.event_name }}"&& \
+             echo "${{ github.ref }}"&& \
+             docker -v && \
+             echo "............."
         
         
