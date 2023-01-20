@@ -13,6 +13,7 @@ jobs:
         name: echo
         run: |
           echo "..."
-          cat /etc/timezone
+          current_timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
+          echo "$current_timezone"
           echo "..."
 
