@@ -10,21 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          images: |
-            ${{ secrets.DOCKERHUB_NAMESPACE }}/yet-another-pihole-dot-doh
-            ghcr.io/${{ github.repository_owner }}/yet-another-pihole-dot-doh
-          flavor: |
-            latest=auto
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=tag
-
-      -
         name: echo
-        run: cat /etc/timezone
+        run: echo "..."
+             cat /etc/timezone
+             echo "..."
 
