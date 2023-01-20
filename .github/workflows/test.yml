@@ -26,5 +26,5 @@ jobs:
 
       -
         name: echo
-        run: echo "${{ steps.meta.outputs.version }}"
+        run: cat /etc/timezone
 
