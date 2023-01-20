@@ -11,7 +11,8 @@ jobs:
     steps:
       -
         name: echo
-        run: echo "..."
-             cat /etc/timezone
-             echo "..."
+        run: |
+          echo "..."
+          cat /etc/timezone
+          echo "..."
 
