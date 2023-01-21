@@ -13,6 +13,8 @@ jobs:
         name: echo
         run: |
           echo "..."
-          echo -e "\e[31mTest\e[0m"
+          echo -e "\e[31m🔥\e[0m"
+          echo -e "🔥"
+          echo "🔥"
           echo "..."
 
