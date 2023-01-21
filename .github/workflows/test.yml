@@ -9,29 +9,12 @@ jobs:
   test_release:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          images: |
-            ${{ secrets.DOCKERHUB_NAMESPACE }}/yet-another-pihole-dot-doh
-            ghcr.io/${{ github.repository_owner }}/yet-another-pihole-dot-doh
-          flavor: |
-            latest=auto
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=tag
-  build-and-publish:
-    needs: test_release
-    runs-on: ubuntu-latest
-    steps:
-      -
+       -
         name: echo
         run: |
           echo "..."
-          echo -e "${{ steps.meta.outputs.version }}"
-          echo "🔥"
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            /repos/ChaseCares/yet-another-pihole-dot-doh/tags/protection
           echo "..."
 
