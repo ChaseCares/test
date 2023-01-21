@@ -36,5 +36,5 @@ jobs:
         name: echo
         run: |
               echo "Separate job"
-              echo "|${{ steps.docker_meta.outputs.tags }}|"
+              echo "|${{ needs.docker_meta.outputs.tags }}|"
 
