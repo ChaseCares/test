@@ -30,10 +30,11 @@ jobs:
 
   echo:
     runs-on: ubuntu-latest
+    needs: docker_meta
     steps:
       -
         name: echo
         run: |
               echo "Separate job"
-              echo ${{ steps.meta.outputs.tags }}
+              echo "|${{ steps.docker_meta.outputs.tags }}|"
 
