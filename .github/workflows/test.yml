@@ -8,6 +8,8 @@ on:
 jobs:
   docker_meta:
     runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
     steps:
       -
         name: Docker meta
