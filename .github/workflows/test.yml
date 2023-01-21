@@ -6,17 +6,35 @@ on:
     types: [published]
 
 jobs:
-  test_release:
+  docker_meta:
     runs-on: ubuntu-latest
     steps:
-       -
-        name: echo
-        env:
-          GH_TOKEN: ${{ github.token }}
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          images: |
+            ${{ secrets.DOCKERHUB_NAMESPACE }}/yet-another-pihole-dot-doh
+            ghcr.io/${{ github.repository_owner }}/yet-another-pihole-dot-doh
+          flavor: |
+            latest=auto
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=tag
+      -
+        name: docker_meta_echo
         run: |
-          echo "..."
-          gh api \
-            -H "Accept: application/vnd.github+json" \
-            /repos/ChaseCares/yet-another-pihole-dot-doh/git/matching-refs/tags
-          echo "..."
+              echo "docker_meta_echo"
+              echo ${{ steps.meta.outputs.tags }}
+
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: echo
+        run: |
+              echo "Separate job"
+              echo ${{ steps.meta.outputs.tags }}
 
