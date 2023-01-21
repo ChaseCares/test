@@ -13,7 +13,6 @@ jobs:
         name: echo
         run: |
           echo "..."
-          current_timezone=$(timedatectl | grep "Time zone" | awk '{print $3}')
-          echo "$current_timezone"
+          echo -e "\e[31mTest\e[0m"
           echo "..."
 
