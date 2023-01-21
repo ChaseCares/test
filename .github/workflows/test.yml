@@ -17,6 +17,6 @@ jobs:
           echo "..."
           gh api \
             -H "Accept: application/vnd.github+json" \
-            /repos/ChaseCares/yet-another-pihole-dot-doh/git/matching-refs/REF
+            /repos/ChaseCares/yet-another-pihole-dot-doh/git/matching-refs/tags
           echo "..."
 
