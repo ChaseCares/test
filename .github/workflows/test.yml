@@ -11,6 +11,8 @@ jobs:
     steps:
        -
         name: echo
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           echo "..."
           gh api \
