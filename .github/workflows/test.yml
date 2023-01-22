@@ -21,11 +21,10 @@ jobs:
     -
       name: Run Checker
       run: |
-        ls -la
-        python get-tags.py \
-                --auth ${{ secrets.FINE_GRAINED_TOKEN }} \
-                --target_owner_repo ${{ secrets.TARGET_OWNER_REPO }} \
-                --local_owner_repo ${{ secrets.LOCAL_OWNER_REPO }} \
-                --discord_webhook ${{ secrets.DISCORD_WEBHOOK }} \
-                --tag_regex ${{ secrets.TAG_REGEX }}
+        python release_creator.py \
+              --auth ${{ secrets.FINE_GRAINED_TOKEN }} \
+              --target_owner_repo ${{ secrets.TARGET_OWNER_REPO }} \
+              --local_owner_repo ${{ secrets.LOCAL_OWNER_REPO }} \
+              --discord_webhook ${{ secrets.DISCORD_WEBHOOK }} \
+              --tag_regex ${{ secrets.TAG_REGEX }}
 
