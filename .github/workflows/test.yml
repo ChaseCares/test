@@ -21,7 +21,7 @@ jobs:
     -
       name: Run Checker
       run: |
-        python ./get-tags.py \
+        python get-tags.py \
                 --auth ${{ secrets.FINE_GRAINED_TOKEN }} \
                 --target_owner_repo ${{ secrets.TARGET_OWNER_REPO }} \
                 --local_owner_repo ${{ secrets.LOCAL_OWNER_REPO }} \
