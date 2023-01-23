@@ -1,14 +1,22 @@
-name: Release Checker
+name: touch ls
 
 on:
   workflow_dispatch:
   
 jobs:
-  checker:
+  touch:
     runs-on: ubuntu-latest
     steps:
       -
-        name: Docker meta
+        name: touch
         run: |
-            echo ${{ vars.DOCKERHUB_NAMESPACE }}
-
+            touch test123.txt
+  
+  his_touch_available_touch:
+    runs-on: ubuntu-latest
+    needs: touch
+    steps:
+      -
+        name: ls
+        run: |
+            ls -al
