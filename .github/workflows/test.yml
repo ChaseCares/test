@@ -3,8 +3,8 @@ run-name: 'Release Checker'
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '48 0 * * *'
+#   schedule:
+#     - cron: '48 0 * * *'
 
 jobs:
   setup-and-check:
