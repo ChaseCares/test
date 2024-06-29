@@ -36,7 +36,7 @@ fn update() -> Result<(), Box<dyn (::std::error::Error)>> {
 }
 
 fn main() {
-    println!("Hello, world!");
+    println!("0.1.5");
     update().unwrap();
     println!("Updated!")
 }
