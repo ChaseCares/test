@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: write
     needs: release
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         # Include all "Tier 1 with Host Tools" targets and "Tier 2 with Host Tools" targets for Windows and macOS,
@@ -31,7 +31,7 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
         include:
           - build: linux
-            os: linux-latest
+            os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             command: cargo
 

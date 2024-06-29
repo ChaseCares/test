@@ -9,7 +9,7 @@ fn update() -> Result<(), Box<dyn (::std::error::Error)>> {
 
     // get the first available release
     let asset = releases[0]
-        .asset_for(self_update::get_target(), None)
+        .asset_for(self_update::get_target(), Some("x86_64-unknown-linux-gnu"))
         .unwrap();
 
     let tmp_dir = tempfile::Builder::new()
