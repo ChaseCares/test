@@ -48,14 +48,14 @@ jobs:
         id: archive
         shell: bash
         run: |
-          DIRECTORY="link_rustler-${{ github.ref_name }}-${{ matrix.build }}"
+          DIRECTORY="test-${{ github.ref_name }}-${{ matrix.build }}"
           if [[ "${{ matrix.target }}" =~ "-pc-windows-" ]]; then
             SUFFIX=".exe"
           else
             SUFFIX=""
           fi
           mkdir "$DIRECTORY"
-          cp "target/${{ matrix.target }}/release/link_rustler$SUFFIX" "$DIRECTORY"
+          cp "target/${{ matrix.target }}/release/test$SUFFIX" "$DIRECTORY"
           7z a "$DIRECTORY.zip" "$DIRECTORY"
           echo "path=$DIRECTORY.zip" >> $GITHUB_OUTPUT
       - env:
