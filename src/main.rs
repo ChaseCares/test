@@ -5,6 +5,7 @@ fn update() -> Result<(), Box<dyn (::std::error::Error)>> {
         .repo_owner("ChaseCares")
         .repo_name("test")
         .bin_name("test")
+        .bin_path_in_archive("{{ bin }}-{{ version }}-{{ target }}/{{ bin }}")
         .show_download_progress(true)
         .current_version(cargo_crate_version!())
         .build()?
@@ -14,6 +15,6 @@ fn update() -> Result<(), Box<dyn (::std::error::Error)>> {
 }
 
 fn main() {
-    println!("version = 0.1.30");
+    println!("version = 0.1.31");
     update().unwrap();
 }
