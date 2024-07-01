@@ -158,10 +158,10 @@ jobs:
         shell: bash
         if: matrix.os != 'windows-latest'
         run: |
-          tar czf "$ARCHIVE.tar.gz" "$ARCHIVE"
-          shasum -a 256 "$ARCHIVE.tar.gz" > "$ARCHIVE.tar.gz.sha256"
-          echo "ASSET=$ARCHIVE.tar.gz" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE.tar.gz.sha256" >> $GITHUB_ENV
+          tar cf "$ARCHIVE.tar" "$ARCHIVE"
+          shasum -a 256 "$ARCHIVE.tar" > "$ARCHIVE.tar.sha256"
+          echo "ASSET=$ARCHIVE.tar" >> $GITHUB_ENV
+          echo "ASSET_SUM=$ARCHIVE.tar.sha256" >> $GITHUB_ENV
 
       - name: Upload release archive
         env:

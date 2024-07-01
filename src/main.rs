@@ -33,7 +33,7 @@ fn update() -> Result<(), Box<dyn Error>> {
 
     // Create a temporary directory for the download
     let tmp_dir = Builder::new()
-        .prefix("self_update_")
+        .prefix("test_")
         .tempdir_in(env::current_dir().unwrap())
         .unwrap();
 
@@ -52,13 +52,14 @@ fn update() -> Result<(), Box<dyn Error>> {
         .download_to(&tmp_tarball)
         .unwrap();
 
-    sleep(Duration::from_secs(10));
+    sleep(Duration::from_secs(15));
 
     // Extract the downloaded tarball to get the new binary
     let bin_name = std::path::PathBuf::from("test");
+    let out = std::path::PathBuf::from("test123");
     Extract::from_source(&tmp_tarball_path)
-        .archive(ArchiveKind::Tar(Some(Compression::Gz)))
-        .extract_file(tmp_dir.path(), bin_name)
+        .archive(ArchiveKind::Tar(None))
+        .extract_into(&out)
         .unwrap();
 
     // // Replace the current executable with the new binary
