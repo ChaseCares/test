@@ -1,42 +1,72 @@
-fn update() -> Result<(), Box<dyn (::std::error::Error)>> {
-    let releases = self_update::backends::github::ReleaseList::configure()
+use reqwest::header::ACCEPT;
+use self_update::{
+    self, backends::github::ReleaseList, ArchiveKind, Compression, Download, Extract,
+};
+use std::env;
+use std::error::Error;
+use std::fs::File;
+use std::path::PathBuf;
+use tempfile::Builder;
+
+fn update() -> Result<(), Box<dyn Error>> {
+    // Configure and fetch release list from GitHub
+    let releases = ReleaseList::configure()
         .repo_owner("ChaseCares")
         .repo_name("test")
-        .build()?
-        .fetch()?;
-    println!("found releases:");
-    println!("{releases:#?}\n");
-
-    // get the first available release
-    let asset = releases[0]
-        .asset_for(self_update::get_target(), Some("x86_64-unknown-linux-gnu"))
+        .build()
+        .unwrap()
+        .fetch()
         .unwrap();
 
-    let tmp_dir = tempfile::Builder::new()
-        .prefix("self_update")
-        .tempdir_in(::std::env::current_dir()?)?;
+    println!("Found releases:");
+    println!("{:#?}\n", releases);
+
+    // Get the first available release asset for the current target
+    let asset = releases
+        .first()
+        // TODO - Use target std::env::consts::ARCH or std::env::consts::OS
+        .and_then(|release| release.asset_for("linux", None))
+        .ok_or("No suitable release asset found")
+        .unwrap();
+
+    println!("Using release asset: {:#?}", asset);
+
+    // Create a temporary directory for the download
+    let tmp_dir = Builder::new()
+        .prefix("self_update_")
+        .tempdir_in(env::current_dir().unwrap())
+        .unwrap();
+
+    println!("Using temp dir: {:#?}", tmp_dir);
+
     let tmp_tarball_path = tmp_dir.path().join(&asset.name);
-    let tmp_tarball = ::std::fs::File::open(&tmp_tarball_path)?;
 
-    self_update::Download::from_url(&asset.download_url)
-        .set_header(reqwest::header::ACCEPT, "application/octet-stream".parse()?)
-        .download_to(&tmp_tarball)?;
+    println!("Using temp tarball: {:#?}", tmp_tarball_path);
 
-    let bin_name = std::path::PathBuf::from("self_update_bin");
-    self_update::Extract::from_source(&tmp_tarball_path)
-        .archive(self_update::ArchiveKind::Tar(Some(
-            self_update::Compression::Gz,
-        )))
-        .extract_file(tmp_dir.path(), &bin_name)?;
+    // Open a file to write the downloaded asset
+    let tmp_tarball = File::create(&tmp_tarball_path).unwrap();
 
-    let new_exe = tmp_dir.path().join(bin_name);
-    self_replace::self_replace(new_exe)?;
+    // Download the release asset
+    Download::from_url(&asset.download_url)
+        .set_header(ACCEPT, "application/octet-stream".parse().unwrap())
+        .download_to(&tmp_tarball)
+        .unwrap();
+
+    // // Extract the downloaded tarball to get the new binary
+    // let bin_name = PathBuf::from("test");
+    // Extract::from_source(&tmp_tarball_path)
+    //     .archive(ArchiveKind::Tar(Some(Compression::Gz)))
+    //     .extract_file(tmp_dir.path(), &bin_name)
+    //     .unwrap();
+
+    // // Replace the current executable with the new binary
+    // let new_exe = tmp_dir.path().join(bin_name);
+    // self_replace::self_replace(new_exe).unwrap();
 
     Ok(())
 }
 
 fn main() {
-    println!("0.1.5");
+    println!("Hello, world!");
     update().unwrap();
-    println!("Updated!")
 }

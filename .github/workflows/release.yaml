@@ -78,7 +78,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            zsh xz-utils liblz4-tool musl-tools brotli zstd
+            pkg-config libssl-dev
+            # zsh xz-utils liblz4-tool musl-tools brotli zstd
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master

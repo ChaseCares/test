@@ -1263,7 +1263,7 @@ dependencies = [
 
 [[package]]
 name = "test"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "reqwest",
  "self-replace",
