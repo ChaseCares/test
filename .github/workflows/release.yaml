@@ -78,7 +78,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            pkg-config libssl-dev
+            pkgconf libssl-dev
             # zsh xz-utils liblz4-tool musl-tools brotli zstd
 
       - name: Install Rust
