@@ -141,7 +141,8 @@ jobs:
       - name: Build archive (Unix)
         shell: bash
         run: |
-          tar czf "$ARCHIVE.tar.gz" "$BIN"
+          # BIN: target/architecture/release/binary
+          tar --strip-components 3 czf "$ARCHIVE.tar.gz" "$BIN"
           shasum -a 256 "$ARCHIVE.tar.gz" > "$ARCHIVE.tar.gz.sha256"
           echo "ASSET=$ARCHIVE.tar.gz" >> $GITHUB_ENV
           echo "ASSET_SUM=$ARCHIVE.tar.gz.sha256" >> $GITHUB_ENV
