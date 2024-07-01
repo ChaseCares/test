@@ -14,6 +14,6 @@ fn update() -> Result<(), Box<dyn (::std::error::Error)>> {
 }
 
 fn main() {
-    println!("version = 0.1.28");
+    println!("version = 0.1.29");
     update().unwrap();
 }

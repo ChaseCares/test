@@ -62,11 +62,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - build: linux
+          - build: linux-musl
             os: ubuntu-latest
             rust: nightly
             target: x86_64-unknown-linux-musl
             strip: x86_64-linux-musl-strip
+          - build: linux-gnu
+            os: ubuntu-latest
+            rust: nightly
+            target: x86_64-unknown-linux-gnu
 
     steps:
       - name: Checkout repository
@@ -138,11 +142,17 @@ jobs:
           version="${{ needs.create-release.outputs.version }}"
           echo "ARCHIVE=${{ env.APP_NAME }}-$version-${{ matrix.target }}" >> $GITHUB_ENV
 
+      - name: Creating directory for archive
+        shell: bash
+        run: |
+          # TODO remove doc?
+          mkdir -p "$ARCHIVE"
+          cp "$BIN" "$ARCHIVE"
+
       - name: Build archive (Unix)
         shell: bash
         run: |
-          # BIN: target/architecture/release/binary
-          tar --strip-components 3 -czf "$ARCHIVE.tar.gz" "$BIN"
+          tar czf "$ARCHIVE.tar.gz" "$ARCHIVE"
           shasum -a 256 "$ARCHIVE.tar.gz" > "$ARCHIVE.tar.gz.sha256"
           echo "ASSET=$ARCHIVE.tar.gz" >> $GITHUB_ENV
           echo "ASSET_SUM=$ARCHIVE.tar.gz.sha256" >> $GITHUB_ENV
