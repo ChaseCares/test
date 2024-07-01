@@ -72,13 +72,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # - name: Install packages (Ubuntu)
-      #   if: matrix.os == 'ubuntu-latest'
-      #   shell: bash
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install pkg-config libssl-dev musl-tools
-
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
@@ -179,3 +172,14 @@ jobs:
         run: |
           version="${{ needs.create-release.outputs.version }}"
           gh release upload "$version" ${{ env.ASSET }} ${{ env.ASSET_SUM }}
+
+
+  finalize_release:
+    name: Finalize release
+    needs: ['build-release']
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set release as published
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit ${{ needs.create-release.outputs.version }} --draft=false
