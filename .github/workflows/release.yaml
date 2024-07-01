@@ -138,25 +138,8 @@ jobs:
           version="${{ needs.create-release.outputs.version }}"
           echo "ARCHIVE=${{ env.APP_NAME }}-$version-${{ matrix.target }}" >> $GITHUB_ENV
 
-      - name: Creating directory for archive
-        shell: bash
-        run: |
-          # TODO remove doc?
-          mkdir -p "$ARCHIVE"
-          cp "$BIN" "$ARCHIVE"/
-
-      - name: Build archive (Windows)
-        shell: bash
-        if: matrix.os == 'windows-latest'
-        run: |
-          7z a "$ARCHIVE.zip" "$ARCHIVE"
-          certutil -hashfile "$ARCHIVE.zip" SHA256 > "$ARCHIVE.zip.sha256"
-          echo "ASSET=$ARCHIVE.zip" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE.zip.sha256" >> $GITHUB_ENV
-
       - name: Build archive (Unix)
         shell: bash
-        if: matrix.os != 'windows-latest'
         run: |
           tar czf "$ARCHIVE.tar.gz" "$ARCHIVE"
           shasum -a 256 "$ARCHIVE.tar.gz" > "$ARCHIVE.tar.gz.sha256"
