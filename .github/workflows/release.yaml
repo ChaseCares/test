@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   create-release:
-    name: create-release
+    name: Create release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
       version: ${{ env.VERSION }}
 
   build-release:
-    name: build-release
+    name: Build release
     needs: ['create-release']
     runs-on: ${{ matrix.os }}
     env:
