@@ -2,10 +2,9 @@ use reqwest::header::ACCEPT;
 use self_update::{
     self, backends::github::ReleaseList, ArchiveKind, Compression, Download, Extract,
 };
-use std::env;
 use std::error::Error;
 use std::fs::File;
-use std::path::PathBuf;
+use std::{env, thread::sleep, time::Duration};
 use tempfile::Builder;
 
 fn update() -> Result<(), Box<dyn Error>> {
@@ -21,11 +20,12 @@ fn update() -> Result<(), Box<dyn Error>> {
     println!("Found releases:");
     println!("{:#?}\n", releases);
 
+    println!("{:#?}\n", self_update::get_target());
+
     // Get the first available release asset for the current target
     let asset = releases
         .first()
-        // TODO - Use target std::env::consts::ARCH or std::env::consts::OS
-        .and_then(|release| release.asset_for("linux", None))
+        .and_then(|release| release.asset_for(self_update::get_target(), None))
         .ok_or("No suitable release asset found")
         .unwrap();
 
@@ -52,12 +52,14 @@ fn update() -> Result<(), Box<dyn Error>> {
         .download_to(&tmp_tarball)
         .unwrap();
 
-    // // Extract the downloaded tarball to get the new binary
-    // let bin_name = PathBuf::from("test");
-    // Extract::from_source(&tmp_tarball_path)
-    //     .archive(ArchiveKind::Tar(Some(Compression::Gz)))
-    //     .extract_file(tmp_dir.path(), &bin_name)
-    //     .unwrap();
+    sleep(Duration::from_secs(10));
+
+    // Extract the downloaded tarball to get the new binary
+    let bin_name = std::path::PathBuf::from("test");
+    Extract::from_source(&tmp_tarball_path)
+        .archive(ArchiveKind::Tar(Some(Compression::Gz)))
+        .extract_file(tmp_dir.path(), bin_name)
+        .unwrap();
 
     // // Replace the current executable with the new binary
     // let new_exe = tmp_dir.path().join(bin_name);

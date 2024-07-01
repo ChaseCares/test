@@ -142,10 +142,8 @@ jobs:
         shell: bash
         run: |
           # TODO remove doc?
-          mkdir -p "$ARCHIVE"/{complete,doc}
+          mkdir -p "$ARCHIVE"
           cp "$BIN" "$ARCHIVE"/
-          # cp {README.md,COPYING,UNLICENSE,LICENSE-MIT} "$ARCHIVE"/
-          # cp {CHANGELOG.md,FAQ.md,GUIDE.md} "$ARCHIVE"/doc/
 
       - name: Build archive (Windows)
         shell: bash
@@ -172,7 +170,6 @@ jobs:
         run: |
           version="${{ needs.create-release.outputs.version }}"
           gh release upload "$version" ${{ env.ASSET }} ${{ env.ASSET_SUM }}
-
 
   finalize_release:
     name: Finalize release
