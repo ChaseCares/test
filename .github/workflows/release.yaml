@@ -48,16 +48,18 @@ jobs:
         id: archive
         shell: bash
         run: |
-          DIRECTORY="test-${{ github.ref_name }}-${{ matrix.build }}"
+          APP_NAME="test"
+          EXTENSION="tar.gz"
+          DIRECTORY="$APP_NAME-${{ github.ref_name }}-${{ matrix.build }}-${{ matrix.target }}"
           if [[ "${{ matrix.target }}" =~ "-pc-windows-" ]]; then
             SUFFIX=".exe"
           else
             SUFFIX=""
           fi
           mkdir "$DIRECTORY"
-          cp "target/${{ matrix.target }}/release/test$SUFFIX" "$DIRECTORY"
-          7z a "$DIRECTORY.zip" "$DIRECTORY"
-          echo "path=$DIRECTORY.zip" >> $GITHUB_OUTPUT
+          cp "target/${{ matrix.target }}/release/$APP_NAME$SUFFIX" "$DIRECTORY"
+          tar --create --gzip --file="$DIRECTORY.$EXTENSION" "$DIRECTORY"
+          echo "path=$DIRECTORY.$EXTENSION" >> $GITHUB_OUTPUT
       - env:
           GH_TOKEN: ${{ github.token }}
         run: gh release upload ${{ github.ref_name }} ${{ steps.archive.outputs.path }}
