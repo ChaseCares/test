@@ -1,0 +1,45 @@
+import { Button } from "std-widgets.slint";
+
+
+export component MainWindow inherits Window {
+    title: "Update Helper";
+
+    in property <string> ver: "";
+    in property <string> log: "";
+    in property <bool> checking: false;
+    in property <bool> self_updateing: false;
+
+    callback check-update();
+    callback self-update();
+
+    GridLayout {
+        padding: 50px;
+        spacing: 25px;
+
+        Button {
+            text: "Check for Update";
+            enabled: !root.checking;
+            clicked => {
+                root.check-update();
+            }
+        }
+
+        Button {
+            text: {
+                "Update to " + root.ver;
+            }
+            visible: root.ver != "";
+            enabled: !root.self_updateing;
+            clicked => {
+                root.self-update();
+            }
+        }
+
+        Rectangle {
+            background: blue;
+            Text {
+                text: root.log;
+            }
+        }
+    }
+}
