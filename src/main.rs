@@ -1,19 +1,29 @@
+use std::cell::RefCell;
+use std::rc::Rc;
+
 slint::include_modules!();
 
-fn update_helper(ui: MainWindow, mut app_state: AppState) {
+fn update_helper(ui: MainWindow, app_state: Rc<RefCell<AppState>>) {
+    let mut app_state = app_state.borrow_mut();
+
     if ui.get_checking() {
         app_state.add_to_log("Already checking for updates...", &ui);
         return;
     }
 
     ui.set_checking(true);
-    app_state.add_to_log("Checking for updates...", &ui);
+
+    if !app_state.self_update {
+        app_state.add_to_log("Checking for updates...", &ui);
+    }
 
     let current_version = env!("CARGO_PKG_VERSION");
-    app_state.add_to_log(&format!("Current version: v{}", current_version), &ui);
+    if !app_state.self_update {
+        app_state.add_to_log(&format!("Current version: v{}", current_version), &ui);
+    }
 
     let status = match self_update::backends::github::Update::configure()
-        .repo_owner("repo_owner")
+        .repo_owner("ChaseCares")
         .repo_name("test")
         .bin_name("test")
         .bin_path_in_archive("{{ bin }}-{{ version }}-{{ target }}/{{ bin }}")
@@ -43,8 +53,28 @@ fn update_helper(ui: MainWindow, mut app_state: AppState) {
             "New update available: v{}, current version: v{}",
             latest.version, current_version
         );
-        app_state.add_to_log(&format!("New update available: v{}", latest.version), &ui);
+        if !app_state.self_update {
+            app_state.add_to_log(&format!("New update available: v{}", latest.version), &ui);
+        }
         ui.set_ver(latest.version.into());
+
+        println!("{:?}", app_state.self_update);
+        if app_state.self_update {
+            println!("Updating Dry run...");
+            // match status.update() {
+            //     Ok(_) => {
+            //         println!("Update successful!");
+            //         app_state.add_to_log("Update successful!", &ui);
+            //     }
+            //     Err(e) => {
+            //         println!("Error updating: {}", e);
+            //         app_state.add_to_log(&format!("Error updating: {}", e), &ui);
+            //     }
+            // }
+
+            // Move inside of match OK
+            ui.set_ver("".into());
+        }
     } else if current_version == latest.version {
         println!("You are already using the latest version.");
         app_state.add_to_log("You are already using the latest version.", &ui);
@@ -79,15 +109,36 @@ impl AppState {
 
 fn main() -> Result<(), slint::PlatformError> {
     let ui = MainWindow::new()?;
-    let ui_weak = ui.as_weak();
+    let ui_weak1 = ui.as_weak();
+    let ui_weak2 = ui_weak1.clone();
 
-    let mut app_state = AppState::new();
-    app_state.add_to_log("Welcome to the test app!", &ui);
-    ui.set_log(app_state.log.as_str().into());
+    let app_state = Rc::new(RefCell::new(AppState::new()));
+    {
+        let app_state = app_state.clone();
+        app_state
+            .borrow_mut()
+            .add_to_log("Welcome to the test app!", &ui);
+        ui.set_log(app_state.borrow().log.as_str().into());
+    }
 
-    ui.on_check_update(move || {
-        if let Some(ui) = ui_weak.upgrade() {
-            update_helper(ui, app_state.clone());
+    ui.on_check_update({
+        let app_state = app_state.clone();
+        move || {
+            if let Some(ui) = ui_weak1.upgrade() {
+                update_helper(ui, app_state.clone());
+            }
+        }
+    });
+
+    ui.on_self_update({
+        let app_state = app_state.clone();
+        move || {
+            if let Some(ui) = ui_weak2.upgrade() {
+                println!("Self update: {:?}", app_state.borrow().self_update);
+                app_state.borrow_mut().self_update = true;
+                ui.set_self_updateing(true);
+                update_helper(ui, app_state.clone());
+            }
         }
     });
 
