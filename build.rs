@@ -1,3 +1,3 @@
 fn main() {
-    slint_build::compile("/home/chase/projects/test/ui/mainwindow.slint").unwrap();
+    slint_build::compile("./ui/mainwindow.slint").unwrap();
 }
