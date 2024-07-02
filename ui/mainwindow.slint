@@ -1,44 +1,80 @@
-import { Button, VerticalBox} from "std-widgets.slint";
+import { Button, VerticalBox, SpinBox, HorizontalBox, GridBox, TabWidget} from "std-widgets.slint";
 
 export component MainWindow inherits Window {
     title: "Update Helper";
-    background: #3b3b3b;
+    background: #2b2b2b;
+    icon: @image-url("../img/icon.png");
+    width: 300px;
 
     in property <string> update_button_text: "Check for Update";
     in property <string> log: "";
 
     in property <bool> checking: false;
-    in property <bool> self_updateing: false;
 
     callback check-update();
-    callback self-update();
+    TabWidget {
+        Tab {
+            title: "Update";
 
-    VerticalLayout {
-        padding: 7px;
+            VerticalLayout {
+                padding: 7px;
 
-        Button {
-            text: root.update_button_text;
-            enabled: {
-                !root.checking && root.update_button_text != "Up to date";
-            }
-            clicked => {
-                root.check-update();
+                GridBox {
+                    Rectangle { }
+
+                    Button {
+                        text: root.update_button_text;
+                        height: 30px;
+                        width: 150px;
+                        enabled: {
+                            !root.checking && root.update_button_text != "Up to date";
+                        }
+                        clicked => {
+                            root.check-update();
+                        }
+                    }
+
+                    Rectangle { }
+                }
+
+                VerticalBox {
+                    HorizontalBox {
+                        Text {
+                            color: #fff;
+                            height: 20px;
+                            vertical-alignment: center;
+                            horizontal-alignment: center;
+                            text: "Log";
+                        }
+                    }
+
+                    Rectangle {
+                        border-color: #808080;
+                        border-width: 2px;
+                        background: #3b3b3b;
+                        max-height: 300px;
+                        min-height: 200px;
+
+                        Rectangle {
+                            width: 96%;
+                            height: 96%;
+                            Text {
+                                horizontal-alignment: left;
+                                vertical-alignment: top;
+                                color: #fff;
+                                width: 100%;
+                                height: 100%;
+                                wrap: word-wrap;
+                                text: root.log;
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        VerticalBox {
-            Text {
-                color: #fff;
-                text: "Log:";
-            }
-
-            Rectangle {
-                background: #2b2b2b;
-                Text {
-                    color: #fff;
-                    text: root.log;
-                }
-            }
+        Tab {
+            title: "Settings";
         }
     }
 }

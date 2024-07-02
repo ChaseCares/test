@@ -3,23 +3,23 @@ use std::rc::Rc;
 
 slint::include_modules!();
 
-fn update_helper(ui: MainWindow, app_state: Rc<RefCell<AppState>>) {
+fn update_helper(ui: &MainWindow, app_state: Rc<RefCell<AppState>>) {
     let mut app_state = app_state.borrow_mut();
 
     if ui.get_checking() {
-        app_state.add_to_log("Already checking for updates...", &ui);
+        app_state.add_to_log("Already checking for updates...", ui);
         return;
     }
 
     ui.set_checking(true);
 
     if !app_state.self_update {
-        app_state.add_to_log("Checking for updates...", &ui);
+        app_state.add_to_log("Checking for updates...", ui);
     }
 
     let current_version = env!("CARGO_PKG_VERSION");
     if !app_state.self_update {
-        app_state.add_to_log(&format!("Current version: v{}", current_version), &ui);
+        app_state.add_to_log(&format!("Current version: v{}", current_version), ui);
     }
 
     let status = match self_update::backends::github::Update::configure()
@@ -33,7 +33,7 @@ fn update_helper(ui: MainWindow, app_state: Rc<RefCell<AppState>>) {
     {
         Ok(status) => status,
         Err(e) => {
-            app_state.add_to_log(&format!("Error configuring update: {}", e), &ui);
+            app_state.add_to_log(&format!("Error configuring update: {}", e), ui);
             ui.set_checking(false);
             return;
         }
@@ -42,7 +42,7 @@ fn update_helper(ui: MainWindow, app_state: Rc<RefCell<AppState>>) {
     let latest = match status.get_latest_release() {
         Ok(latest) => latest,
         Err(e) => {
-            app_state.add_to_log(&format!("Error fetching latest release: {}", e), &ui);
+            app_state.add_to_log(&format!("Error fetching latest release: {}", e), ui);
             ui.set_checking(false);
             return;
         }
@@ -55,23 +55,23 @@ fn update_helper(ui: MainWindow, app_state: Rc<RefCell<AppState>>) {
                 latest.version, current_version
             );
             if !app_state.self_update {
-                app_state.add_to_log(&format!("New update available: v{}", latest.version), &ui);
+                app_state.add_to_log(&format!("New update available: v{}", latest.version), ui);
             }
 
             if app_state.self_update {
                 // TODO! move in to match statement
                 ui.set_update_button_text("Up to date".into());
                 // TODO! Remove
-                app_state.add_to_log("Update successful!", &ui);
+                app_state.add_to_log("Update successful!", ui);
 
                 // match status.update() {
                 //     Ok(_) => {
                 //         println!("Update successful!");
-                //         app_state.add_to_log("Update successful!", &ui);
+                //         app_state.add_to_log("Update successful!", ui);
                 //     }
                 //     Err(e) => {
                 //         println!("Error updating: {}", e);
-                //         app_state.add_to_log(&format!("Error updating: {}", e), &ui);
+                //         app_state.add_to_log(&format!("Error updating: {}", e), ui);
                 //     }
                 // }
             } else {
@@ -82,15 +82,15 @@ fn update_helper(ui: MainWindow, app_state: Rc<RefCell<AppState>>) {
         }
         Ok(false) if current_version == latest.version => {
             println!("You are already using the latest version.");
-            app_state.add_to_log("You are already using the latest version.", &ui);
+            app_state.add_to_log("You are already using the latest version.", ui);
         }
         Ok(false) => {
             println!("You are using a newer version than the latest.");
-            app_state.add_to_log("You are using a newer version than the latest.", &ui);
+            app_state.add_to_log("You are using a newer version than the latest.", ui);
         }
         Err(e) => {
             println!("Error comparing versions: {}", e);
-            app_state.add_to_log(&format!("Error comparing versions: {}", e), &ui);
+            app_state.add_to_log(&format!("Error comparing versions: {}", e), ui);
         }
     }
 
@@ -121,34 +121,20 @@ impl AppState {
 fn main() -> Result<(), slint::PlatformError> {
     let ui = MainWindow::new()?;
     let ui_weak1 = ui.as_weak();
-    // let ui_weak2 = ui_weak1.clone();
 
     let app_state = Rc::new(RefCell::new(AppState::new()));
-    app_state
-        .borrow_mut()
-        .add_to_log("Welcome to the test app!", &ui);
     ui.set_log(app_state.borrow().log.as_str().into());
+
+    update_helper(&ui, app_state.clone());
 
     ui.on_check_update({
         let app_state = app_state.clone();
         move || {
             if let Some(ui) = ui_weak1.upgrade() {
-                update_helper(ui, app_state.clone());
+                update_helper(&ui, app_state.clone());
             }
         }
     });
-
-    // ui.on_self_update({
-    //     let app_state = app_state.clone();
-    //     move || {
-    //         if let Some(ui) = ui_weak2.upgrade() {
-    //             println!("Self update: {:?}", app_state.borrow().self_update);
-    //             app_state.borrow_mut().self_update = true;
-    //             ui.set_self_updateing(true);
-    //             update_helper(ui, app_state.clone());
-    //         }
-    //     }
-    // });
 
     ui.run()
 }
