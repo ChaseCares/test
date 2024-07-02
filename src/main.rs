@@ -2,18 +2,15 @@ slint::include_modules!();
 
 fn update_helper(ui: MainWindow, mut app_state: AppState) {
     if ui.get_checking() {
-        app_state.add_to_log("Already checking for updates...");
-        ui.set_log(app_state.log.clone().into());
+        app_state.add_to_log("Already checking for updates...", &ui);
         return;
     }
 
     ui.set_checking(true);
-    app_state.add_to_log("Checking for updates...");
-    ui.set_log(app_state.log.clone().into());
+    app_state.add_to_log("Checking for updates...", &ui);
 
     let current_version = env!("CARGO_PKG_VERSION");
-    app_state.add_to_log(&format!("Current version: v{}", current_version));
-    ui.set_log(app_state.log.clone().into());
+    app_state.add_to_log(&format!("Current version: v{}", current_version), &ui);
 
     let status = match self_update::backends::github::Update::configure()
         .repo_owner("repo_owner")
@@ -26,8 +23,7 @@ fn update_helper(ui: MainWindow, mut app_state: AppState) {
     {
         Ok(status) => status,
         Err(e) => {
-            app_state.add_to_log(&format!("Error configuring update: {}", e));
-            ui.set_log(app_state.log.clone().into());
+            app_state.add_to_log(&format!("Error configuring update: {}", e), &ui);
             ui.set_checking(false);
             return;
         }
@@ -36,8 +32,7 @@ fn update_helper(ui: MainWindow, mut app_state: AppState) {
     let latest = match status.get_latest_release() {
         Ok(latest) => latest,
         Err(e) => {
-            app_state.add_to_log(&format!("Error fetching latest release: {}", e));
-            ui.set_log(app_state.log.clone().into());
+            app_state.add_to_log(&format!("Error fetching latest release: {}", e), &ui);
             ui.set_checking(false);
             return;
         }
@@ -48,17 +43,16 @@ fn update_helper(ui: MainWindow, mut app_state: AppState) {
             "New update available: v{}, current version: v{}",
             latest.version, current_version
         );
-        app_state.add_to_log(&format!("New update available: v{}", latest.version));
+        app_state.add_to_log(&format!("New update available: v{}", latest.version), &ui);
         ui.set_ver(latest.version.into());
     } else if current_version == latest.version {
         println!("You are already using the latest version.");
-        app_state.add_to_log("You are already using the latest version.");
+        app_state.add_to_log("You are already using the latest version.", &ui);
     } else {
         println!("You are using a newer version than the latest.");
-        app_state.add_to_log("You are using a newer version than the latest.");
+        app_state.add_to_log("You are using a newer version than the latest.", &ui);
     }
 
-    ui.set_log(app_state.log.clone().into());
     ui.set_checking(false);
 }
 
@@ -76,9 +70,10 @@ impl AppState {
         }
     }
 
-    fn add_to_log(&mut self, message: &str) {
+    fn add_to_log(&mut self, message: &str, ui: &MainWindow) {
         self.log.push_str(message);
         self.log.push('\n');
+        ui.set_log(self.log.clone().into());
     }
 }
 
@@ -87,7 +82,7 @@ fn main() -> Result<(), slint::PlatformError> {
     let ui_weak = ui.as_weak();
 
     let mut app_state = AppState::new();
-    app_state.add_to_log("Welcome to the test app!");
+    app_state.add_to_log("Welcome to the test app!", &ui);
     ui.set_log(app_state.log.as_str().into());
 
     ui.on_check_update(move || {
