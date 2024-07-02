@@ -48,39 +48,50 @@ fn update_helper(ui: MainWindow, app_state: Rc<RefCell<AppState>>) {
         }
     };
 
-    if self_update::version::bump_is_greater(current_version, &latest.version).unwrap_or(false) {
-        println!(
-            "New update available: v{}, current version: v{}",
-            latest.version, current_version
-        );
-        if !app_state.self_update {
-            app_state.add_to_log(&format!("New update available: v{}", latest.version), &ui);
-        }
-        ui.set_ver(latest.version.into());
+    match self_update::version::bump_is_greater(current_version, &latest.version) {
+        Ok(true) => {
+            println!(
+                "New update available: v{}, current version: v{}",
+                latest.version, current_version
+            );
+            if !app_state.self_update {
+                app_state.add_to_log(&format!("New update available: v{}", latest.version), &ui);
+            }
 
-        println!("{:?}", app_state.self_update);
-        if app_state.self_update {
-            println!("Updating Dry run...");
-            // match status.update() {
-            //     Ok(_) => {
-            //         println!("Update successful!");
-            //         app_state.add_to_log("Update successful!", &ui);
-            //     }
-            //     Err(e) => {
-            //         println!("Error updating: {}", e);
-            //         app_state.add_to_log(&format!("Error updating: {}", e), &ui);
-            //     }
-            // }
+            if app_state.self_update {
+                // TODO! move in to match statement
+                ui.set_update_button_text("Up to date".into());
+                // TODO! Remove
+                app_state.add_to_log("Update successful!", &ui);
 
-            // Move inside of match OK
-            ui.set_ver("".into());
+                // match status.update() {
+                //     Ok(_) => {
+                //         println!("Update successful!");
+                //         app_state.add_to_log("Update successful!", &ui);
+                //     }
+                //     Err(e) => {
+                //         println!("Error updating: {}", e);
+                //         app_state.add_to_log(&format!("Error updating: {}", e), &ui);
+                //     }
+                // }
+            } else {
+                ui.set_update_button_text(format!("Update to v{}", latest.version).into());
+                println!("app_state.self_update: {}", app_state.self_update);
+                app_state.self_update = true;
+            }
         }
-    } else if current_version == latest.version {
-        println!("You are already using the latest version.");
-        app_state.add_to_log("You are already using the latest version.", &ui);
-    } else {
-        println!("You are using a newer version than the latest.");
-        app_state.add_to_log("You are using a newer version than the latest.", &ui);
+        Ok(false) if current_version == latest.version => {
+            println!("You are already using the latest version.");
+            app_state.add_to_log("You are already using the latest version.", &ui);
+        }
+        Ok(false) => {
+            println!("You are using a newer version than the latest.");
+            app_state.add_to_log("You are using a newer version than the latest.", &ui);
+        }
+        Err(e) => {
+            println!("Error comparing versions: {}", e);
+            app_state.add_to_log(&format!("Error comparing versions: {}", e), &ui);
+        }
     }
 
     ui.set_checking(false);
@@ -110,16 +121,13 @@ impl AppState {
 fn main() -> Result<(), slint::PlatformError> {
     let ui = MainWindow::new()?;
     let ui_weak1 = ui.as_weak();
-    let ui_weak2 = ui_weak1.clone();
+    // let ui_weak2 = ui_weak1.clone();
 
     let app_state = Rc::new(RefCell::new(AppState::new()));
-    {
-        let app_state = app_state.clone();
-        app_state
-            .borrow_mut()
-            .add_to_log("Welcome to the test app!", &ui);
-        ui.set_log(app_state.borrow().log.as_str().into());
-    }
+    app_state
+        .borrow_mut()
+        .add_to_log("Welcome to the test app!", &ui);
+    ui.set_log(app_state.borrow().log.as_str().into());
 
     ui.on_check_update({
         let app_state = app_state.clone();
@@ -130,17 +138,17 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     });
 
-    ui.on_self_update({
-        let app_state = app_state.clone();
-        move || {
-            if let Some(ui) = ui_weak2.upgrade() {
-                println!("Self update: {:?}", app_state.borrow().self_update);
-                app_state.borrow_mut().self_update = true;
-                ui.set_self_updateing(true);
-                update_helper(ui, app_state.clone());
-            }
-        }
-    });
+    // ui.on_self_update({
+    //     let app_state = app_state.clone();
+    //     move || {
+    //         if let Some(ui) = ui_weak2.upgrade() {
+    //             println!("Self update: {:?}", app_state.borrow().self_update);
+    //             app_state.borrow_mut().self_update = true;
+    //             ui.set_self_updateing(true);
+    //             update_helper(ui, app_state.clone());
+    //         }
+    //     }
+    // });
 
     ui.run()
 }
