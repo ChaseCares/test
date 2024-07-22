@@ -4,7 +4,7 @@ version = "0.1.33"
 edition = "2021"
 
 [dependencies]
-openssl = { version = "0.10.64", features = ["vendored"] }
+openssl = { version = "0.10.66", features = ["vendored"] }
 self_update = { version = "0.40.0", features = [
     "archive-tar",
     "compression-flate2",
